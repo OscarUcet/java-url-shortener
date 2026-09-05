@@ -23,23 +23,29 @@ This project is a practical training exercise focused on:
 - Containerizing the application with Docker.
 - Deploying a backend application to a cloud environment.
 
-The implementation will prioritize understanding the responsibility of each component and the reasons behind architectural decisions rather than simply reproducing code.
+The implementation prioritizes understanding the responsibility of each component and the reasons behind architectural decisions rather than simply reproducing code.
 
 ---
 
 ## 📌 Project Scope
 
-The initial version will provide a simple URL shortening service.
+The initial version provides a simple URL shortening service.
 
-The core functionality will include:
+The core functionality includes:
 
 - Creating shortened URLs.
-- Retrieving shortened URL information.
+- Retrieving the original URL using a short code.
 - Redirecting users to the original URL.
-- Deleting shortened URLs.
 - Persisting URL information in a relational database.
-- Validating incoming requests.
-- Handling application errors.
+
+The following functionality will be implemented as the project progresses:
+
+- Deleting shortened URLs.
+- Request validation.
+- Centralized error handling.
+- API documentation.
+- Automated tests.
+- Containerized application deployment.
 
 Additional capabilities may be introduced later as part of the training process.
 
@@ -76,7 +82,7 @@ Additional capabilities may be introduced later as part of the training process.
 
 ## 🏗️ Architecture
 
-The application will follow a layered architecture:
+The application follows a layered architecture:
 
 ```text
 Client
@@ -126,8 +132,6 @@ The architecture may evolve as the project grows.
 
 ## 📁 Project Structure
 
-The initial structure will follow this organization:
-
 ```text
 src/
 └── main/
@@ -153,8 +157,6 @@ Additional packages will only be introduced when they have a clear purpose.
 
 ## 📡 API
 
-The initial API will expose endpoints similar to:
-
 ### Create a short URL
 
 ```http
@@ -171,17 +173,28 @@ Example request:
 
 Example response:
 
-```json
-{
-  "code": "aB72x",
-  "shortUrl": "http://localhost:8080/aB72x"
-}
+```text
+aB72x
 ```
 
-### Get link information
+The returned code can be used to access the shortened URL.
+
+### Get the original URL
 
 ```http
 GET /api/links/{code}
+```
+
+Example:
+
+```http
+GET /api/links/aB72x
+```
+
+Example response:
+
+```text
+https://example.com/some/very/long/url
 ```
 
 ### Redirect to the original URL
@@ -190,13 +203,61 @@ GET /api/links/{code}
 GET /{code}
 ```
 
+Example:
+
+```http
+GET /aB72x
+```
+
+The API responds with an HTTP `302 Found` redirect to the original URL.
+
 ### Delete a short URL
 
 ```http
 DELETE /api/links/{code}
 ```
 
+This endpoint is part of the planned API and will be implemented in a later stage.
+
 > API endpoints will be documented and updated as the implementation progresses.
+
+---
+
+## 🐘 Database
+
+The application uses **PostgreSQL** for persistent storage.
+
+For local development, PostgreSQL can be run using Docker Compose.
+
+The application connects to the local database through Spring Data JPA and Hibernate.
+
+Hibernate is currently configured to automatically update the database schema based on the application entities during development.
+
+---
+
+## 🐳 Docker
+
+Docker is currently used to provide the PostgreSQL development environment.
+
+Start the database with:
+
+```bash
+docker compose up -d
+```
+
+Check the container:
+
+```bash
+docker compose ps
+```
+
+Stop the database with:
+
+```bash
+docker compose down
+```
+
+The API itself can be containerized as part of the deployment stage.
 
 ---
 
@@ -277,10 +338,15 @@ Examples:
 
 ```text
 feat: add URL creation endpoint
+
 fix: validate duplicated short codes
+
 refactor: extract URL generation logic
+
 test: add URL service tests
+
 docs: update API documentation
+
 chore: configure PostgreSQL
 ```
 
@@ -354,11 +420,13 @@ application-local.properties
 
 Actual credentials must never be placed in public files.
 
+> The current local development configuration uses development-only database credentials. Production configuration will use environment variables or another secure configuration mechanism.
+
 ---
 
 ## 🔮 Future Learning Areas
 
-The project may be extended to explore additional backend technologies and concepts:
+The project may be extended to explore additional backend technologies and concepts.
 
 ### Authentication & Security
 
@@ -372,6 +440,7 @@ The project may be extended to explore additional backend technologies and conce
 - URL expiration
 - Custom aliases
 - User-owned links
+- Improved short-code generation
 
 ### Analytics
 
@@ -399,26 +468,48 @@ These features are not part of the initial implementation and will only be added
 
 ### Requirements
 
-- Java
-- Maven
-- PostgreSQL
+- Java 21
+- Docker
+- Git
 
-Clone the repository:
+Maven does not need to be installed globally because the project includes the Maven Wrapper.
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/java-url-shortener.git
 ```
 
-Navigate to the project:
+### Navigate to the project
 
 ```bash
 cd java-url-shortener
 ```
 
-Configure the local database connection and run the application:
+### Start PostgreSQL
+
+```bash
+docker compose up -d
+```
+
+Verify that the database container is running:
+
+```bash
+docker compose ps
+```
+
+### Run the application
+
+On Linux/macOS:
 
 ```bash
 ./mvnw spring-boot:run
+```
+
+On Windows:
+
+```bash
+./mvnw.cmd spring-boot:run
 ```
 
 The API will be available at:
@@ -427,13 +518,46 @@ The API will be available at:
 http://localhost:8080
 ```
 
-Swagger UI will be available at:
+### Test URL creation
 
-```text
-http://localhost:8080/swagger-ui/index.html
+```bash
+curl -X POST http://localhost:8080/api/links \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://www.google.com"}'
 ```
 
-> Local setup instructions will be updated as the project configuration is implemented.
+The API will return a short code similar to:
+
+```text
+38871e
+```
+
+### Test URL retrieval
+
+```bash
+curl http://localhost:8080/api/links/38871e
+```
+
+Expected response:
+
+```text
+https://www.google.com
+```
+
+### Test URL redirection
+
+```bash
+curl -i http://localhost:8080/38871e
+```
+
+Expected response:
+
+```text
+HTTP/1.1 302
+Location: https://www.google.com
+```
+
+Swagger UI will be available once OpenAPI/Swagger support is implemented.
 
 ---
 
@@ -443,7 +567,7 @@ This project is not intended to be a production-scale URL shortening platform.
 
 It is a practical training project designed to understand how Java and Spring Boot are used to build backend applications.
 
-The project will favor:
+The project favors:
 
 - Understanding over memorization.
 - Simple solutions over unnecessary complexity.
@@ -455,9 +579,20 @@ The project will favor:
 
 ## 📌 Project Status
 
-**Training project — initial setup.**
+**Training project — functional MVP in development.**
 
-The repository currently contains the project documentation and development guidelines. Implementation will be developed incrementally through feature branches.
+The current implementation provides:
+
+- REST API built with Java and Spring Boot.
+- URL shortening.
+- PostgreSQL persistence.
+- Spring Data JPA / Hibernate integration.
+- URL retrieval by short code.
+- HTTP `302` redirection.
+- Docker-based PostgreSQL development environment.
+- Layered backend architecture.
+
+Next development stages include validation, centralized error handling, deletion, automated tests, API documentation, containerizing the application, and cloud deployment.
 
 ---
 
