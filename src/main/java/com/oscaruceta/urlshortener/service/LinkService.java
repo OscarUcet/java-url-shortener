@@ -26,4 +26,11 @@ public class LinkService {
 
         return code;
     }
+
+    public String getOriginalUrl(String code) {
+        ShortLink shortLink = shortLinkRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Short link not found"));
+
+        return shortLink.getOriginalUrl();
+    }
 }
