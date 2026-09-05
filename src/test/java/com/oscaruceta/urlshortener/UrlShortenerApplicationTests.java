@@ -1,4 +1,4 @@
-package com.oscaruceta.url_shortener;
+package com.oscaruceta.urlshortener;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
