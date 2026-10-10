@@ -2,6 +2,7 @@ package com.oscaruceta.urlshortener.service;
 
 import com.oscaruceta.urlshortener.entity.ShortLink;
 import com.oscaruceta.urlshortener.repository.ShortLinkRepository;
+import com.oscaruceta.urlshortener.exception.ShortLinkNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -33,7 +34,7 @@ public class LinkService {
 
     public String getOriginalUrl(String code) {
         ShortLink shortLink = shortLinkRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Short link not found"));
+                .orElseThrow(() -> new ShortLinkNotFoundException(code));
 
         return shortLink.getOriginalUrl();
     }
@@ -49,7 +50,7 @@ public class LinkService {
 
             if (scheme == null
                     || !(scheme.equalsIgnoreCase("http")
-                    || scheme.equalsIgnoreCase("https"))
+                            || scheme.equalsIgnoreCase("https"))
                     || uri.getHost() == null
                     || uri.getHost().isBlank()) {
                 throw new IllegalArgumentException(
