@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/links")
 public class LinkController {
@@ -22,7 +24,7 @@ public class LinkController {
     }
 
     @PostMapping
-    public String createLink(@RequestBody CreateLinkRequest request) {
+    public String createLink(@RequestBody @Valid CreateLinkRequest request) {
         return linkService.createLink(request.getUrl());
     }
 
