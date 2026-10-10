@@ -1,53 +1,50 @@
 # Java URL Shortener
 
-A URL shortener REST API built with **Java and Spring Boot** as a practical training project.
+A URL shortener REST API built with **Java 21 and Spring Boot** as a practical backend training and portfolio project.
 
-The goal of this project is to learn and apply the Java/Spring ecosystem through a small but functional backend application while following clean and maintainable development practices.
+The project focuses on understanding the Java and Spring ecosystem through a functional backend application, emphasizing maintainable code, automated testing, validation, error handling, and API documentation.
 
-The project is intentionally kept small so that the focus remains on understanding the technologies and backend concepts rather than building unnecessary features.
+The scope is intentionally kept small to prioritize practical learning and avoid unnecessary complexity.
 
 ---
 
 ## 🎯 Project Goals
 
-This project is a practical training exercise focused on:
+This project explores the following backend concepts:
 
-- Learning Java from a backend development perspective.
-- Understanding the Spring Boot ecosystem.
 - Building REST APIs with Spring Boot.
-- Working with relational databases using JPA/Hibernate.
 - Applying a layered backend architecture.
-- Practicing validation and error handling.
-- Learning backend security with Spring Security and JWT.
-- Exploring reactive programming with Spring WebFlux.
-- Containerizing the application with Docker.
-- Deploying a backend application to a cloud environment.
+- Persisting data with PostgreSQL and Spring Data JPA.
+- Validating incoming requests.
+- Handling application errors consistently.
+- Documenting APIs with OpenAPI and Swagger UI.
+- Writing automated tests.
+- Managing changes through Git and GitHub.
+- Preparing a backend application for cloud deployment.
 
-The implementation prioritizes understanding the responsibility of each component and the reasons behind architectural decisions rather than simply reproducing code.
+Future stages may explore authentication, URL expiration, rate limiting, and other backend concepts.
 
 ---
 
-## 📌 Project Scope
+## 📌 Project Status
 
-The initial version provides a simple URL shortening service.
+**Functional MVP in development.**
 
-The core functionality includes:
+The current implementation supports creating shortened URLs, retrieving their original destinations, and redirecting clients to those destinations.
 
-- Creating shortened URLs.
-- Retrieving the original URL using a short code.
-- Redirecting users to the original URL.
-- Persisting URL information in a relational database.
+Implemented features:
 
-The following functionality will be implemented as the project progresses:
-
-- Deleting shortened URLs.
-- Request validation.
-- Centralized error handling.
-- API documentation.
+- URL shortening and PostgreSQL persistence.
+- URL retrieval by short code.
+- HTTP `302 Found` redirection.
+- HTTP/HTTPS URL validation.
+- Request validation and centralized error handling.
+- HTTP `404 Not Found` handling for missing short links.
 - Automated tests.
-- Containerized application deployment.
+- OpenAPI specification and Swagger UI.
+- Git feature-branch workflow.
 
-Additional capabilities may be introduced later as part of the training process.
+The application is a learning and portfolio project, not a production-ready URL shortening service.
 
 ---
 
@@ -55,28 +52,31 @@ Additional capabilities may be introduced later as part of the training process.
 
 ### Backend
 
-- Java
+- Java 21
 - Spring Boot
 - Spring Web
 - Spring Data JPA
 - Hibernate
+- Jakarta Bean Validation
 - Maven
 
 ### Database
 
-- PostgreSQL
+- PostgreSQL 15
+- Docker Compose for the local database environment
 
 ### API Documentation
 
-- OpenAPI
+- OpenAPI 3.1
+- springdoc-openapi
 - Swagger UI
 
-### Development & Deployment
+### Development Tools
 
 - Git
 - GitHub
+- Maven Wrapper
 - Docker
-- Cloud deployment
 
 ---
 
@@ -86,33 +86,33 @@ The application follows a layered architecture:
 
 ```text
 Client
-  │
-  ▼
+  |
+  v
 Controller
-  │
-  ▼
+  |
+  v
 Service
-  │
-  ▼
+  |
+  v
 Repository
-  │
-  ▼
-Database
+  |
+  v
+PostgreSQL
 ```
 
 ### Main responsibilities
 
 **Controller**
 
-Handles HTTP requests and responses.
+Handles HTTP requests and responses and exposes the API endpoints.
 
 **Service**
 
-Contains the application's business logic.
+Contains the application's business logic, including link creation and URL retrieval.
 
 **Repository**
 
-Handles persistence and communication with the database through Spring Data JPA.
+Handles persistence through Spring Data JPA.
 
 **Entity**
 
@@ -120,13 +120,15 @@ Represents data persisted in the database.
 
 **DTO**
 
-Defines the data exchanged through the API without exposing database entities directly.
+Defines request data exchanged through the API without exposing database entities directly.
 
 **Exception**
 
 Contains application-specific exceptions and centralized error handling.
 
-The architecture may evolve as the project grows.
+**Config**
+
+Contains application configuration, including OpenAPI metadata.
 
 ---
 
@@ -134,36 +136,47 @@ The architecture may evolve as the project grows.
 
 ```text
 src/
-└── main/
-    ├── java/
-    │   └── com/
-    │       └── oscaruceta/
-    │           └── urlshortener/
-    │               ├── controller/
-    │               ├── service/
-    │               ├── repository/
-    │               ├── entity/
-    │               ├── dto/
-    │               ├── exception/
-    │               └── UrlShortenerApplication.java
-    │
-    └── resources/
-        └── application.properties
+├── main/
+│   ├── java/
+│   │   └── com/
+│   │       └── USER_GITHUB/
+│   │           └── urlshortener/
+│   │               ├── config/
+│   │               │   └── OpenApiConfig.java
+│   │               ├── controller/
+│   │               │   ├── LinkController.java
+│   │               │   └── RedirectController.java
+│   │               ├── dto/
+│   │               ├── entity/
+│   │               ├── exception/
+│   │               ├── repository/
+│   │               ├── service/
+│   │               └── UrlShortenerApplication.java
+│   └── resources/
+│       └── application.properties
+└── test/
+    └── java/
+        └── com/
+            └── USER_GITHUB/
+                └── urlshortener/
 ```
 
-Additional packages will only be introduced when they have a clear purpose.
+The test directory contains automated tests for application behavior and validation.
 
 ---
 
-## 📡 API
+## 📡 API Reference
 
-### Create a short URL
+The API currently exposes three endpoints.
+
+### 1. Create a shortened link
 
 ```http
 POST /api/links
+Content-Type: application/json
 ```
 
-Example request:
+Request body:
 
 ```json
 {
@@ -174,12 +187,17 @@ Example request:
 Example response:
 
 ```text
-aB72x
+aB3xYz
 ```
 
-The returned code can be used to access the shortened URL.
+The response contains the generated short code as plain text.
 
-### Get the original URL
+Documented responses:
+
+- `200 OK` — short link created successfully.
+- `400 Bad Request` — invalid request data or URL.
+
+### 2. Retrieve the original URL
 
 ```http
 GET /api/links/{code}
@@ -188,7 +206,7 @@ GET /api/links/{code}
 Example:
 
 ```http
-GET /api/links/aB72x
+GET /api/links/aB3xYz
 ```
 
 Example response:
@@ -197,7 +215,12 @@ Example response:
 https://example.com/some/very/long/url
 ```
 
-### Redirect to the original URL
+Documented responses:
+
+- `200 OK` — original URL retrieved successfully.
+- `404 Not Found` — the supplied short code does not exist.
+
+### 3. Redirect to the original URL
 
 ```http
 GET /{code}
@@ -206,261 +229,62 @@ GET /{code}
 Example:
 
 ```http
-GET /aB72x
+GET /aB3xYz
 ```
 
-The API responds with an HTTP `302 Found` redirect to the original URL.
+The API responds with an HTTP `302 Found` status and a `Location` header containing the original URL. The client can then navigate to that destination.
 
-### Delete a short URL
+Documented responses:
 
-```http
-DELETE /api/links/{code}
-```
+- `302 Found` — redirect to the original URL.
+- `404 Not Found` — the supplied short code does not exist.
 
-This endpoint is part of the planned API and will be implemented in a later stage.
+### Interactive API documentation
 
-> API endpoints will be documented and updated as the implementation progresses.
+Swagger UI allows developers to inspect and try the API endpoints through a browser.
+
+When running locally:
+
+- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
+- **OpenAPI JSON:** http://localhost:8080/v3/api-docs
 
 ---
 
 ## 🐘 Database
 
-The application uses **PostgreSQL** for persistent storage.
+The application uses PostgreSQL for persistent storage and Spring Data JPA/Hibernate for database access.
 
-For local development, PostgreSQL can be run using Docker Compose.
+The local database environment is managed through Docker Compose.
 
-The application connects to the local database through Spring Data JPA and Hibernate.
+Hibernate is currently configured to update the database schema automatically during development. This is a development convenience and should be reviewed before a production deployment.
 
-Hibernate is currently configured to automatically update the database schema based on the application entities during development.
+Database credentials and environment-specific configuration should not be committed as production secrets.
 
 ---
 
 ## 🐳 Docker
 
-Docker is currently used to provide the PostgreSQL development environment.
+Docker Compose is currently used to run PostgreSQL locally. The API itself is not yet containerized.
 
-Start the database with:
+Start the database:
 
 ```bash
 docker compose up -d
 ```
 
-Check the container:
+Check the container status:
 
 ```bash
 docker compose ps
 ```
 
-Stop the database with:
+Stop the database:
 
 ```bash
 docker compose down
 ```
 
-The API itself can be containerized as part of the deployment stage.
-
----
-
-## 🌱 Branching Strategy
-
-This project uses a lightweight Git branching strategy designed for a small individual project.
-
-### `main`
-
-The main branch represents the stable version of the project.
-
-Rules:
-
-- Do not develop directly on `main`.
-- Changes should be introduced through a feature, fix, or documentation branch.
-- `main` should remain in a functional state.
-
-### `feature/*`
-
-Used for new functionality.
-
-Examples:
-
-```text
-feature/create-short-url
-feature/url-redirect
-feature/url-statistics
-```
-
-### `fix/*`
-
-Used for correcting bugs or unexpected behavior.
-
-Examples:
-
-```text
-fix/invalid-url-validation
-fix/expired-link-redirect
-```
-
-### `docs/*`
-
-Used for documentation-only changes.
-
-Examples:
-
-```text
-docs/update-readme
-docs/api-documentation
-```
-
-Branches should have a short, descriptive name using lowercase words separated by hyphens.
-
----
-
-## 📝 Commit Convention
-
-The project follows a lightweight version of **Conventional Commits**.
-
-Format:
-
-```text
-type: short description
-```
-
-Common types:
-
-| Type | Purpose |
-|---|---|
-| `feat` | Add a new feature |
-| `fix` | Fix a bug |
-| `refactor` | Change code structure without changing behavior |
-| `test` | Add or modify tests |
-| `docs` | Documentation changes |
-| `chore` | Maintenance or configuration changes |
-
-Examples:
-
-```text
-feat: add URL creation endpoint
-
-fix: validate duplicated short codes
-
-refactor: extract URL generation logic
-
-test: add URL service tests
-
-docs: update API documentation
-
-chore: configure PostgreSQL
-```
-
-Commit messages should describe the change clearly and remain concise.
-
----
-
-## 🔄 Development Workflow
-
-For a new feature:
-
-```text
-main
-  │
-  └── feature/my-feature
-          │
-          ├── development
-          ├── testing
-          └── commit
-                │
-                ▼
-              merge
-                │
-                ▼
-              main
-```
-
-Typical workflow:
-
-```bash
-git switch main
-git pull
-git switch -c feature/my-feature
-```
-
-After completing and testing the change:
-
-```bash
-git add .
-git commit -m "feat: add my feature"
-```
-
-The branch can then be merged into `main`.
-
-After merging, the feature branch can be removed.
-
----
-
-## 🔐 Configuration & Security
-
-Sensitive information must never be committed to the repository.
-
-This includes:
-
-- Database passwords.
-- API keys.
-- Access tokens.
-- JWT secrets.
-- Cloud credentials.
-- Environment-specific secrets.
-
-Environment-specific configuration should be kept outside version control whenever possible.
-
-Example:
-
-```text
-application.properties
-application-local.properties
-.env
-```
-
-Actual credentials must never be placed in public files.
-
-> The current local development configuration uses development-only database credentials. Production configuration will use environment variables or another secure configuration mechanism.
-
----
-
-## 🔮 Future Learning Areas
-
-The project may be extended to explore additional backend technologies and concepts.
-
-### Authentication & Security
-
-- Spring Security
-- JWT authentication
-- User accounts
-- Authorization
-
-### URL Management
-
-- URL expiration
-- Custom aliases
-- User-owned links
-- Improved short-code generation
-
-### Analytics
-
-- Click counting
-- Access timestamps
-- Basic usage statistics
-
-### Reactive Programming
-
-- Spring WebFlux
-- Reactive endpoints
-- Reactive data access
-
-### Infrastructure
-
-- Docker
-- Containerized PostgreSQL
-- Cloud deployment
-
-These features are not part of the initial implementation and will only be added when they provide meaningful learning value.
+The database data may persist in a Docker volume, depending on the Compose configuration.
 
 ---
 
@@ -469,24 +293,24 @@ These features are not part of the initial implementation and will only be added
 ### Requirements
 
 - Java 21
-- Docker
+- Docker with Docker Compose
 - Git
 
-Maven does not need to be installed globally because the project includes the Maven Wrapper.
+Maven does not need to be installed globally because the repository includes the Maven Wrapper.
 
-### Clone the repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/java-url-shortener.git
+git clone https://github.com/OscarUcet/java-url-shortener.git
 ```
 
-### Navigate to the project
+### 2. Navigate to the project
 
 ```bash
 cd java-url-shortener
 ```
 
-### Start PostgreSQL
+### 3. Start PostgreSQL
 
 ```bash
 docker compose up -d
@@ -498,18 +322,34 @@ Verify that the database container is running:
 docker compose ps
 ```
 
-### Run the application
+Ensure the database configuration in `src/main/resources/application.properties` matches the local PostgreSQL setup.
 
-On Linux/macOS:
+### 4. Run the tests
+
+On Windows:
 
 ```bash
-./mvnw spring-boot:run
+./mvnw.cmd test
 ```
+
+On Linux or macOS:
+
+```bash
+./mvnw test
+```
+
+### 5. Start the application
 
 On Windows:
 
 ```bash
 ./mvnw.cmd spring-boot:run
+```
+
+On Linux or macOS:
+
+```bash
+./mvnw spring-boot:run
 ```
 
 The API will be available at:
@@ -518,7 +358,15 @@ The API will be available at:
 http://localhost:8080
 ```
 
-### Test URL creation
+Swagger UI will be available at:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+### 6. Test URL creation
+
+Using `curl`:
 
 ```bash
 curl -X POST http://localhost:8080/api/links \
@@ -526,73 +374,221 @@ curl -X POST http://localhost:8080/api/links \
   -d '{"url":"https://www.google.com"}'
 ```
 
-The API will return a short code similar to:
+The response will contain a generated short code.
 
-```text
-38871e
-```
+### 7. Test URL retrieval
 
-### Test URL retrieval
+Replace `YOUR_CODE` with the code returned by the creation endpoint:
 
 ```bash
-curl http://localhost:8080/api/links/38871e
+curl http://localhost:8080/api/links/YOUR_CODE
 ```
 
-Expected response:
+The response will contain the original URL as plain text.
 
-```text
-https://www.google.com
-```
-
-### Test URL redirection
+### 8. Test URL redirection
 
 ```bash
-curl -i http://localhost:8080/38871e
+curl -i http://localhost:8080/YOUR_CODE
 ```
 
-Expected response:
+The response should include an HTTP `302` status and a `Location` header pointing to the original URL.
+
+---
+
+## 🧪 Testing
+
+The project includes automated tests for request validation, URL handling, and missing short links.
+
+Run the complete test suite with the Maven Wrapper:
+
+```bash
+./mvnw test
+```
+
+On Windows:
+
+```bash
+./mvnw.cmd test
+```
+
+Tests should pass before changes are merged into `main`.
+
+---
+
+## 🌱 Branching Strategy
+
+The project uses a lightweight feature-branch workflow.
+
+**`main`**
+
+The stable integration branch. Changes should be merged only after implementation and verification.
+
+**`feat/...`**
+
+Used for new features and capabilities.
+
+Examples:
 
 ```text
-HTTP/1.1 302
-Location: https://www.google.com
+feat/url-validation
+feat/not-found-handling
+feat/api-documentation
 ```
 
-Swagger UI will be available once OpenAPI/Swagger support is implemented.
+**`fix/...`**
+
+Used for bug fixes.
+
+Examples:
+
+```text
+fix/invalid-url-validation
+fix/expired-link-redirect
+```
+
+**`docs/...`**
+
+Used for documentation-only changes.
+
+Examples:
+
+```text
+docs/update-readme
+docs/deployment-guide
+```
+
+Typical workflow:
+
+```bash
+git switch main
+git pull origin main
+git switch -c feat/my-feature
+```
+
+After implementation and testing:
+
+```bash
+git add .
+git commit -m "feat: describe the new feature"
+```
+
+Merge the completed branch into `main` after verifying the changes:
+
+```bash
+git switch main
+git pull origin main
+git merge --no-ff feat/my-feature
+./mvnw test
+git push origin main
+```
+
+After a successful merge, remove the local feature branch:
+
+```bash
+git branch -d feat/my-feature
+```
+
+---
+
+## 📝 Commit Convention
+
+The project follows Conventional Commits.
+
+Format:
+
+```text
+type: short description
+```
+
+Common types:
+
+| Type       | Purpose                      |
+| ---------- | ---------------------------- |
+| `feat`     | Add a feature                |
+| `fix`      | Fix a bug                    |
+| `refactor` | Improve internal structure   |
+| `test`     | Add or modify tests          |
+| `docs`     | Update documentation         |
+| `chore`    | Maintenance or configuration |
+
+Examples:
+
+```text
+feat: add URL creation endpoint
+fix: handle missing short links
+test: add URL validation tests
+docs: document API with OpenAPI
+chore: configure PostgreSQL
+```
+
+---
+
+## 🔐 Configuration and Security
+
+Sensitive information must never be committed to the public repository.
+
+Examples include:
+
+- Production database passwords.
+- API keys and access tokens.
+- JWT secrets.
+- Cloud credentials.
+
+Use environment variables or an appropriate secrets-management mechanism for production configuration.
+
+The current local development configuration uses development-only database credentials. It must not be reused as a production configuration.
+
+Rate limiting, abuse prevention, link expiration, and production deployment security remain future work. The current implementation should not be considered hardened against public abuse.
+
+---
+
+## 🔮 Future Development
+
+Planned improvements may include:
+
+### URL Management
+
+- URL expiration and automatic cleanup.
+- Custom aliases.
+- Improved short-code generation.
+- Link deletion.
+
+### Abuse Prevention
+
+- Rate limiting for link creation.
+- Request limits and abuse controls.
+- Resource cleanup for expired links.
+
+### Deployment
+
+- Containerizing the API.
+- Production database configuration.
+- Free-tier cloud deployment, subject to provider limits.
+- Public demo URL and deployment documentation.
+
+### Advanced Backend Learning
+
+- Spring Security and JWT.
+- User accounts and authorization.
+- Click counting and usage statistics.
+- Exploring Spring WebFlux and reactive programming where appropriate.
+
+These features will be added incrementally when they provide meaningful learning value.
 
 ---
 
 ## 📚 Learning Philosophy
 
-This project is not intended to be a production-scale URL shortening platform.
-
-It is a practical training project designed to understand how Java and Spring Boot are used to build backend applications.
-
-The project favors:
+This project favors:
 
 - Understanding over memorization.
 - Simple solutions over unnecessary complexity.
 - Clean code over premature abstraction.
 - Practical best practices over excessive process.
-- Incremental learning over building everything at once.
+- Incremental progress over unfinished feature accumulation.
 
----
-
-## 📌 Project Status
-
-**Training project — functional MVP in development.**
-
-The current implementation provides:
-
-- REST API built with Java and Spring Boot.
-- URL shortening.
-- PostgreSQL persistence.
-- Spring Data JPA / Hibernate integration.
-- URL retrieval by short code.
-- HTTP `302` redirection.
-- Docker-based PostgreSQL development environment.
-- Layered backend architecture.
-
-Next development stages include validation, centralized error handling, deletion, automated tests, API documentation, containerizing the application, and cloud deployment.
+The goal is to build a demonstrable backend portfolio project while developing practical Java and Spring Boot skills.
 
 ---
 
@@ -600,7 +596,7 @@ Next development stages include validation, centralized error handling, deletion
 
 **Oscar Uceta**
 
-Full Stack Developer.
+Full Stack Developer
 
 This project is part of my ongoing training to expand my backend development skills into the Java and Spring ecosystem.
 
@@ -608,4 +604,4 @@ This project is part of my ongoing training to expand my backend development ski
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
