@@ -1,12 +1,10 @@
 # Java URL Shortener
 
-A URL shortener REST API built with **Java 21 and Spring Boot** as a practical backend training and portfolio project.
+A URL shortener REST API built with **Java 21 and Spring Boot 4** as a practical backend training and portfolio project.
 
-The project focuses on understanding the Java and Spring ecosystem through a functional backend application, emphasizing maintainable code, automated testing, validation, error handling, and API documentation.
+The project focuses on building a maintainable backend application with REST endpoints, PostgreSQL persistence, request validation, centralized error handling, automated tests, API documentation, and cloud deployment.
 
 The scope is intentionally kept small to prioritize practical learning and avoid unnecessary complexity.
-
----
 
 ## 🎯 Project Goals
 
@@ -17,68 +15,89 @@ This project explores the following backend concepts:
 - Persisting data with PostgreSQL and Spring Data JPA.
 - Validating incoming requests.
 - Handling application errors consistently.
-- Documenting APIs with OpenAPI and Swagger UI.
+- Documenting APIs with OpenAPI.
 - Writing automated tests.
 - Managing changes through Git and GitHub.
-- Preparing a backend application for cloud deployment.
+- Containerizing and deploying a backend application.
+- Configuring a remote PostgreSQL database using environment variables.
 
 Future stages may explore authentication, URL expiration, rate limiting, and other backend concepts.
 
----
-
 ## 📌 Project Status
 
-**Functional MVP in development.**
+**Functional MVP deployed and undergoing final portfolio preparation.**
 
-The current implementation supports creating shortened URLs, retrieving their original destinations, and redirecting clients to those destinations.
+The application supports creating shortened URLs, retrieving their original destinations, and redirecting clients to those destinations.
 
-Implemented features:
+### Implemented features
 
-- URL shortening and PostgreSQL persistence.
+- URL shortening with PostgreSQL persistence.
 - URL retrieval by short code.
 - HTTP `302 Found` redirection.
 - HTTP/HTTPS URL validation.
-- Request validation and centralized error handling.
+- Request validation and centralized exception handling.
 - HTTP `404 Not Found` handling for missing short links.
 - Automated tests.
-- OpenAPI specification and Swagger UI.
-- Git feature-branch workflow.
+- OpenAPI specification generation.
+- Docker image for the application.
+- Docker Compose for the local PostgreSQL environment.
+- Deployment on Render.
+- Remote PostgreSQL database hosted on Neon.
+- Environment-based database configuration.
+- Git feature-branch workflow and integration into `main`.
 
-The application is a learning and portfolio project, not a production-ready URL shortening service.
+### Current limitations
 
----
+- Swagger UI's public route still needs to be verified and its previous `404` response resolved.
+- The README and public demo documentation are undergoing final review.
+- Authentication, rate limiting, URL expiration, and abuse prevention are not yet implemented.
+
+This is a learning and portfolio project. It is not intended to be a production-hardened public URL shortening service.
+
+## 🌐 Live Demo
+
+**Base URL:** https://java-url-shortener-azwh.onrender.com
+
+**OpenAPI specification:** [View OpenAPI JSON](https://java-url-shortener-azwh.onrender.com/v3/api-docs)
+
+The backend is deployed on Render and connects to PostgreSQL hosted on Neon.
+
+The OpenAPI JSON endpoint is available. Interactive Swagger UI is still being investigated and should not be considered available until its route has been verified.
+
+Free-tier hosting may introduce startup delays after periods of inactivity and is subject to provider limits.
 
 ## 🛠️ Technology Stack
 
 ### Backend
 
 - Java 21
-- Spring Boot
+- Spring Boot 4.0.8
 - Spring Web
 - Spring Data JPA
-- Hibernate
+- Hibernate ORM
 - Jakarta Bean Validation
 - Maven
 
 ### Database
 
-- PostgreSQL 15
+- PostgreSQL
 - Docker Compose for the local database environment
+- Neon for the hosted PostgreSQL database
 
 ### API Documentation
 
-- OpenAPI 3.1
+- OpenAPI
 - springdoc-openapi
-- Swagger UI
+- Swagger UI integration
 
-### Development Tools
+### Deployment and Development Tools
 
+- Docker
+- Docker Compose
+- Render
 - Git
 - GitHub
 - Maven Wrapper
-- Docker
-
----
 
 ## 🏗️ Architecture
 
@@ -130,8 +149,6 @@ Contains application-specific exceptions and centralized error handling.
 
 Contains application configuration, including OpenAPI metadata.
 
----
-
 ## 📁 Project Structure
 
 ```text
@@ -139,7 +156,7 @@ src/
 ├── main/
 │   ├── java/
 │   │   └── com/
-│   │       └── USER_GITHUB/
+│   │       └── oscaruceta/
 │   │           └── urlshortener/
 │   │               ├── config/
 │   │               │   └── OpenApiConfig.java
@@ -157,19 +174,21 @@ src/
 └── test/
     └── java/
         └── com/
-            └── USER_GITHUB/
+            └── oscaruceta/
                 └── urlshortener/
 ```
 
 The test directory contains automated tests for application behavior and validation.
-
----
 
 ## 📡 API Reference
 
 The API currently exposes three endpoints.
 
 ### 1. Create a shortened link
+
+**Endpoint:** `POST /api/links`
+
+Request:
 
 ```http
 POST /api/links
@@ -192,16 +211,14 @@ aB3xYz
 
 The response contains the generated short code as plain text.
 
-Documented responses:
+Responses:
 
 - `200 OK` — short link created successfully.
 - `400 Bad Request` — invalid request data or URL.
 
 ### 2. Retrieve the original URL
 
-```http
-GET /api/links/{code}
-```
+**Endpoint:** `GET /api/links/{code}`
 
 Example:
 
@@ -215,16 +232,14 @@ Example response:
 https://example.com/some/very/long/url
 ```
 
-Documented responses:
+Responses:
 
 - `200 OK` — original URL retrieved successfully.
 - `404 Not Found` — the supplied short code does not exist.
 
 ### 3. Redirect to the original URL
 
-```http
-GET /{code}
-```
+**Endpoint:** `GET /{code}`
 
 Example:
 
@@ -232,39 +247,48 @@ Example:
 GET /aB3xYz
 ```
 
-The API responds with an HTTP `302 Found` status and a `Location` header containing the original URL. The client can then navigate to that destination.
+The API responds with HTTP `302 Found` and a `Location` header containing the original URL. The client can then navigate to that destination.
 
-Documented responses:
+Responses:
 
 - `302 Found` — redirect to the original URL.
 - `404 Not Found` — the supplied short code does not exist.
 
-### Interactive API documentation
+### API Documentation
 
-Swagger UI allows developers to inspect and try the API endpoints through a browser.
+The OpenAPI specification is available at:
 
-When running locally:
+- **OpenAPI JSON:** https://java-url-shortener-azwh.onrender.com/v3/api-docs
+- **Local OpenAPI JSON:** http://localhost:8080/v3/api-docs
 
-- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
-- **OpenAPI JSON:** http://localhost:8080/v3/api-docs
-
----
+Swagger UI is intended to provide an interactive interface for inspecting and testing the endpoints. Its public URL remains pending verification.
 
 ## 🐘 Database
 
 The application uses PostgreSQL for persistent storage and Spring Data JPA/Hibernate for database access.
 
-The local database environment is managed through Docker Compose.
+The project uses two database environments:
 
-Hibernate is currently configured to update the database schema automatically during development. This is a development convenience and should be reviewed before a production deployment.
+- **Local development:** PostgreSQL managed with Docker Compose.
+- **Hosted environment:** PostgreSQL hosted on Neon.
 
-Database credentials and environment-specific configuration should not be committed as production secrets.
+Database connection settings are supplied through environment variables:
 
----
+| Variable | Purpose |
+|---|---|
+| `DB_URL` | JDBC connection URL |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+
+The local configuration provides development defaults. Production credentials must be supplied through the hosting provider's environment configuration and must never be committed to GitHub.
+
+Hibernate is currently configured with `spring.jpa.hibernate.ddl-auto=update`. This simplifies development but should be reviewed before treating the application as production-ready. A migration tool such as Flyway may be considered in a future stage.
 
 ## 🐳 Docker
 
-Docker Compose is currently used to run PostgreSQL locally. The API itself is not yet containerized.
+The application includes a multi-stage Dockerfile that builds the Spring Boot application and runs the resulting JAR on a Java 21 runtime image.
+
+Docker Compose is used to manage the local PostgreSQL database.
 
 Start the database:
 
@@ -286,7 +310,25 @@ docker compose down
 
 The database data may persist in a Docker volume, depending on the Compose configuration.
 
----
+Build the application image from the project root:
+
+```bash
+docker build -t java-url-shortener .
+```
+
+The hosted Render service uses the Dockerfile to build and run the application.
+
+## ☁️ Deployment
+
+The backend is deployed on Render, with PostgreSQL hosted on Neon.
+
+**Deployment URL:** https://java-url-shortener-azwh.onrender.com
+
+The application reads the database connection settings from environment variables. Production credentials are configured in Render rather than stored in the source repository.
+
+The service has successfully started in Render and connected to the remote database. The public API has also been tested for link creation, retrieval, and HTTP redirection.
+
+Free hosting services may have usage limits, cold starts, or other restrictions. Availability is subject to the hosting providers' terms and limits.
 
 ## ▶️ Running Locally
 
@@ -322,14 +364,24 @@ Verify that the database container is running:
 docker compose ps
 ```
 
-Ensure the database configuration in `src/main/resources/application.properties` matches the local PostgreSQL setup.
+Ensure that `src/main/resources/application.properties` matches your local PostgreSQL configuration.
+
+The local development defaults are:
+
+```properties
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/url_shortener}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:postgres}
+```
+
+These defaults are for local development only. Do not use development credentials as production secrets.
 
 ### 4. Run the tests
 
-On Windows:
+On Windows using the Maven Wrapper:
 
-```bash
-./mvnw.cmd test
+```powershell
+.\mvnw.cmd test
 ```
 
 On Linux or macOS:
@@ -342,8 +394,8 @@ On Linux or macOS:
 
 On Windows:
 
-```bash
-./mvnw.cmd spring-boot:run
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
 On Linux or macOS:
@@ -358,12 +410,6 @@ The API will be available at:
 http://localhost:8080
 ```
 
-Swagger UI will be available at:
-
-```text
-http://localhost:8080/swagger-ui/index.html
-```
-
 ### 6. Test URL creation
 
 Using `curl`:
@@ -374,7 +420,7 @@ curl -X POST http://localhost:8080/api/links \
   -d '{"url":"https://www.google.com"}'
 ```
 
-The response will contain a generated short code.
+The response will contain the generated short code.
 
 ### 7. Test URL retrieval
 
@@ -394,27 +440,27 @@ curl -i http://localhost:8080/YOUR_CODE
 
 The response should include an HTTP `302` status and a `Location` header pointing to the original URL.
 
----
-
 ## 🧪 Testing
 
 The project includes automated tests for request validation, URL handling, and missing short links.
 
-Run the complete test suite with the Maven Wrapper:
+The latest confirmed test run completed with **11 tests, 0 failures, and 0 errors**.
+
+Run the complete test suite with the Maven Wrapper.
+
+On Windows:
+
+```powershell
+.\mvnw.cmd test
+```
+
+On Linux or macOS:
 
 ```bash
 ./mvnw test
 ```
 
-On Windows:
-
-```bash
-./mvnw.cmd test
-```
-
 Tests should pass before changes are merged into `main`.
-
----
 
 ## 🌱 Branching Strategy
 
@@ -422,7 +468,7 @@ The project uses a lightweight feature-branch workflow.
 
 **`main`**
 
-The stable integration branch. Changes should be merged only after implementation and verification.
+The primary integration branch. Changes should be merged after implementation and verification.
 
 **`feat/...`**
 
@@ -431,9 +477,9 @@ Used for new features and capabilities.
 Examples:
 
 ```text
-feat/url-validation
-feat/not-found-handling
-feat/api-documentation
+feat/url-expiration
+feat/rate-limiting
+feat/click-statistics
 ```
 
 **`fix/...`**
@@ -444,7 +490,7 @@ Examples:
 
 ```text
 fix/invalid-url-validation
-fix/expired-link-redirect
+fix/not-found-handling
 ```
 
 **`docs/...`**
@@ -489,7 +535,11 @@ After a successful merge, remove the local feature branch:
 git branch -d feat/my-feature
 ```
 
----
+Delete the remote feature branch when it is no longer needed:
+
+```bash
+git push origin --delete feat/my-feature
+```
 
 ## 📝 Commit Convention
 
@@ -503,14 +553,14 @@ type: short description
 
 Common types:
 
-| Type       | Purpose                      |
-| ---------- | ---------------------------- |
-| `feat`     | Add a feature                |
-| `fix`      | Fix a bug                    |
-| `refactor` | Improve internal structure   |
-| `test`     | Add or modify tests          |
-| `docs`     | Update documentation         |
-| `chore`    | Maintenance or configuration |
+| Type | Purpose |
+|---|---|
+| `feat` | Add a feature |
+| `fix` | Fix a bug |
+| `refactor` | Improve internal structure |
+| `test` | Add or modify tests |
+| `docs` | Update documentation |
+| `chore` | Maintenance or configuration |
 
 Examples:
 
@@ -521,8 +571,6 @@ test: add URL validation tests
 docs: document API with OpenAPI
 chore: configure PostgreSQL
 ```
-
----
 
 ## 🔐 Configuration and Security
 
@@ -537,15 +585,13 @@ Examples include:
 
 Use environment variables or an appropriate secrets-management mechanism for production configuration.
 
-The current local development configuration uses development-only database credentials. It must not be reused as a production configuration.
+The current application is intended for learning and demonstration. It has not been hardened against public abuse.
 
-Rate limiting, abuse prevention, link expiration, and production deployment security remain future work. The current implementation should not be considered hardened against public abuse.
-
----
+Rate limiting, URL expiration, resource cleanup, and other abuse-prevention measures remain future work.
 
 ## 🔮 Future Development
 
-Planned improvements may include:
+Planned improvements may include the following.
 
 ### URL Management
 
@@ -559,24 +605,26 @@ Planned improvements may include:
 - Rate limiting for link creation.
 - Request limits and abuse controls.
 - Resource cleanup for expired links.
+- Restrictions on excessive demo usage.
 
-### Deployment
-
-- Containerizing the API.
-- Production database configuration.
-- Free-tier cloud deployment, subject to provider limits.
-- Public demo URL and deployment documentation.
-
-### Advanced Backend Learning
+### Backend Security
 
 - Spring Security and JWT.
 - User accounts and authorization.
-- Click counting and usage statistics.
+- Production-oriented configuration and database migrations.
+
+### Analytics
+
+- Click counting.
+- Link usage statistics.
+- Basic analytics for shortened URLs.
+
+### Advanced Backend Learning
+
 - Exploring Spring WebFlux and reactive programming where appropriate.
+- Integrating an AI-powered feature when it provides meaningful value to the project.
 
-These features will be added incrementally when they provide meaningful learning value.
-
----
+These features will be added incrementally after the current MVP and portfolio documentation are finalized.
 
 ## 📚 Learning Philosophy
 
@@ -590,8 +638,6 @@ This project favors:
 
 The goal is to build a demonstrable backend portfolio project while developing practical Java and Spring Boot skills.
 
----
-
 ## 👨‍💻 Author
 
 **Oscar Uceta**
@@ -599,8 +645,6 @@ The goal is to build a demonstrable backend portfolio project while developing p
 Full Stack Developer
 
 This project is part of my ongoing training to expand my backend development skills into the Java and Spring ecosystem.
-
----
 
 ## 📄 License
 
