@@ -156,7 +156,7 @@ src/
 ├── main/
 │   ├── java/
 │   │   └── com/
-│   │       └── oscaruceta/
+│   │       └── Git_Hub_User/
 │   │           └── urlshortener/
 │   │               ├── config/
 │   │               │   └── OpenApiConfig.java
@@ -174,7 +174,7 @@ src/
 └── test/
     └── java/
         └── com/
-            └── oscaruceta/
+            └── Git_Hub_User/
                 └── urlshortener/
 ```
 
